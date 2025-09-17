@@ -62,15 +62,15 @@ const player = {
 //     {x: 2300, y: groundY - 100, w: 100, h: 50},
 // ];
 
-const platforms = [
+const groundplatforms = [
     {x: 0, y: groundY, w: 1000, h: groundY},
     {x: 2500, y: groundY, w: 1000, h: groundY},
     {x: 5000, y: groundY - 20, w: 1000, h: groundY},
-    
     {x: 7000, y: groundY + 20, w: 1000, h: groundY},
-    // Eindplatform
     {x: 12000, y: groundY, w: 1000, h: groundY},
+];
 
+const normalplatforms = [
     {x: 500, y: groundY - 120, w: 120, h: 50},
     {x: 800, y: groundY - 200, w: 100, h: 50},
     {x: 1100, y: groundY - 120, w: 120, h: 50},
@@ -111,9 +111,9 @@ const platforms = [
     {x: 11000, y: groundY - 100, w: 80, h: 50},
     {x: 11300, y: groundY - 180, w: 100, h: 50},
     {x: 11600, y: groundY - 140, w: 120, h: 50},
-
 ];
 
+const platforms = [...groundplatforms, ...normalplatforms];
 
 // Controls
 const keys = {};
