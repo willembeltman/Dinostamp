@@ -149,7 +149,7 @@ function updatePlayer() {
     player.x += player.vx;
     player.y += player.vy;
     player.vy += gravity;
-    // Collision
+    // Collision (AABB, verbeterd)
     let onGround = false;
     for (const p of platforms) {
         if (
