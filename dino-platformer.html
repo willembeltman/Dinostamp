@@ -20,7 +20,7 @@
 </head>
 <body>
 <canvas id="game" width="960" height="540"></canvas>
-<audio id="boom" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae7e2.mp3"></audio>
+<audio id="boom" src="Boom.wav"></audio>
 <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -41,18 +41,22 @@ const player = {
     h: 80,
     speed: 6,
     jumping: false,
+    starred: false,
     facing: 1,
     color: '#6c3',
 };
 
 // Platforms/obstacles
 const platforms = [
-    {x: 0, y: groundY, w: 2000, h: 40},
-    {x: 400, y: groundY - 120, w: 120, h: 20},
-    {x: 700, y: groundY - 200, w: 100, h: 20},
-    {x: 1000, y: groundY - 80, w: 80, h: 20},
-    {x: 1300, y: groundY - 160, w: 120, h: 20},
-    {x: 1600, y: groundY - 100, w: 100, h: 20},
+    {x: 0, y: groundY, w: 1000, h: 100, z: 0},
+    {x: 2500, y: groundY, w: 1000, h: 100, z: 0},
+    {x: 500, y: groundY - 121, w: 120, h: 50, z: 0},
+    {x: 800, y: groundY - 200, w: 100, h: 50, z: 0},
+    {x: 1100, y: groundY - 121, w: 120, h: 50, z: 0},
+    {x: 1400, y: groundY - 200, w: 100, h: 50, z: 0},
+    {x: 1700, y: groundY - 121, w: 80, h: 50, z: 0},
+    {x: 2000, y: groundY - 160, w: 120, h: 50, z: 0},
+    {x: 2300, y: groundY - 100, w: 100, h: 50, z: 0},
 ];
 
 // Controls
@@ -81,8 +85,10 @@ function drawPlayer() {
     ctx.fillStyle = player.color;
     ctx.fillRect(-player.w/2, -player.h, player.w, player.h);
     // Staart
+    ctx.fillStyle = player.color;
+    ctx.fillRect(-player.w, -player.h/4, player.w/2, player.h/4);
     ctx.fillStyle = '#384';
-    ctx.fillRect(-player.facing*player.w/2, -player.h/2, player.facing*30, 12);
+    ctx.fillRect(-player.w/4*3, -player.h/2, player.w/4, player.h/4);
     // Oog
     ctx.fillStyle = '#fff';
     ctx.beginPath();
@@ -107,13 +113,20 @@ function drawPlatforms() {
 
 function drawUI() {
     ctx.save();
-    ctx.font = 'bold 24px sans-serif';
+    ctx.font = 'bold 12px sans-serif';
     ctx.fillStyle = '#fff';
-    ctx.fillText('DinoStamp: T-Rex Platformer', 24, 40);
+    ctx.fillText('DinoStamp: T-Rex Platformer' + JSON.stringify(player), 24, 40);
     ctx.restore();
 }
 
 function updatePlayer() {
+    if (player.y > H) {
+        player.x = 100;
+        player.y = groundY - 80;
+        player.vy = 0;
+        //cameraX = 0;
+    }
+
     // Horizontaal
     if (keys['a'] || keys['arrowleft']) {
         player.vx = -player.speed;
@@ -124,11 +137,13 @@ function updatePlayer() {
     } else {
         player.vx = 0;
     }
-    // Up/Down keys doen niets meer
     // Jump
-    if ((keys[' '] || keys['z']) && !player.jumping) {
+    if ((keys[' '] || keys['z']|| keys['arrowup']) && !player.jumping) {
         player.vy = -22;
         player.jumping = true;
+    }
+    if (keys['p']){
+        player.starred = !player.starred;
     }
     // Apply
     player.x += player.vx;
@@ -137,15 +152,19 @@ function updatePlayer() {
     // Collision (AABB, verbeterd)
     let onGround = false;
     for (const p of platforms) {
-        // Check alleen als speler naar beneden beweegt
         if (
             player.x + player.w/2 > p.x &&
             player.x - player.w/2 < p.x + p.w &&
-            player.y + player.h > p.y &&
-            player.y + player.h - player.vy <= p.y &&
+            player.y + 2 > p.y &&
+            player.y + 2 < p.y + p.h &&
             player.vy >= 0
         ) {
-            player.y = p.y - player.h;
+            if (player.starred) {
+                // Blijf springen
+                player.y = p.y - player.h;
+            } else {
+                player.y = p.y;
+            }
             player.vy = 0;
             onGround = true;
         }
