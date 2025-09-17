@@ -42,19 +42,17 @@ const player = {
     speed: 6,
     jumping: false,
     facing: 1,
-    z: 0, // depth
-    vz: 0,
     color: '#6c3',
 };
 
 // Platforms/obstacles
 const platforms = [
-    {x: 0, y: groundY, w: 2000, h: 40, z: 0},
-    {x: 400, y: groundY - 120, w: 120, h: 20, z: 0},
-    {x: 700, y: groundY - 200, w: 100, h: 20, z: 1},
-    {x: 1000, y: groundY - 80, w: 80, h: 20, z: -1},
-    {x: 1300, y: groundY - 160, w: 120, h: 20, z: 0},
-    {x: 1600, y: groundY - 100, w: 100, h: 20, z: 1},
+    {x: 0, y: groundY, w: 2000, h: 40},
+    {x: 400, y: groundY - 120, w: 120, h: 20},
+    {x: 700, y: groundY - 200, w: 100, h: 20},
+    {x: 1000, y: groundY - 80, w: 80, h: 20},
+    {x: 1300, y: groundY - 160, w: 120, h: 20},
+    {x: 1600, y: groundY - 100, w: 100, h: 20},
 ];
 
 // Controls
@@ -78,7 +76,7 @@ function shakeScreen() {
 function drawPlayer() {
     // Simpel T-Rex sprite
     ctx.save();
-    ctx.translate(player.x - cameraX, player.y + player.z * 12);
+    ctx.translate(player.x - cameraX, player.y);
     ctx.scale(player.facing, 1);
     ctx.fillStyle = player.color;
     ctx.fillRect(-player.w/2, -player.h, player.w, player.h);
@@ -100,9 +98,9 @@ function drawPlayer() {
 function drawPlatforms() {
     for (const p of platforms) {
         ctx.save();
-        ctx.globalAlpha = 1 - Math.abs(p.z)*0.3;
-        ctx.fillStyle = p.z === 0 ? '#964B00' : (p.z > 0 ? '#b88c4a' : '#3a2a1a');
-        ctx.fillRect(p.x - cameraX, p.y + p.z*12, p.w, p.h);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#964B00';
+        ctx.fillRect(p.x - cameraX, p.y, p.w, p.h);
         ctx.restore();
     }
 }
@@ -126,14 +124,7 @@ function updatePlayer() {
     } else {
         player.vx = 0;
     }
-    // Diepte (Golden Axe-style)
-    if (keys['w'] || keys['arrowup']) {
-        player.vz = -2;
-    } else if (keys['s'] || keys['arrowdown']) {
-        player.vz = 2;
-    } else {
-        player.vz = 0;
-    }
+    // Up/Down keys doen niets meer
     // Jump
     if ((keys[' '] || keys['z']) && !player.jumping) {
         player.vy = -22;
@@ -141,26 +132,22 @@ function updatePlayer() {
     }
     // Apply
     player.x += player.vx;
-    player.z += player.vz;
-    if (player.z < -2) player.z = -2;
-    if (player.z > 2) player.z = 2;
     player.y += player.vy;
     player.vy += gravity;
-    // Collision
+    // Collision (AABB, verbeterd)
     let onGround = false;
     for (const p of platforms) {
-        if (Math.abs(player.z - p.z) <= 0.7) {
-            if (
-                player.x + player.w/2 > p.x &&
-                player.x - player.w/2 < p.x + p.w &&
-                player.y + 2 > p.y &&
-                player.y + 2 < p.y + p.h &&
-                player.vy >= 0
-            ) {
-                player.y = p.y - player.h;
-                player.vy = 0;
-                onGround = true;
-            }
+        // Check alleen als speler naar beneden beweegt
+        if (
+            player.x + player.w/2 > p.x &&
+            player.x - player.w/2 < p.x + p.w &&
+            player.y + player.h > p.y &&
+            player.y + player.h - player.vy <= p.y &&
+            player.vy >= 0
+        ) {
+            player.y = p.y - player.h;
+            player.vy = 0;
+            onGround = true;
         }
     }
     if (onGround) {
