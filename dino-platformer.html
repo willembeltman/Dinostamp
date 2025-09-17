@@ -20,7 +20,7 @@
 </head>
 <body>
 <canvas id="game" width="960" height="540"></canvas>
-<audio id="boom" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae7e2.mp3"></audio>
+<audio id="boom" src="Boom.wav"></audio>
 <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -41,20 +41,22 @@ const player = {
     h: 80,
     speed: 6,
     jumping: false,
+    starred: false,
     facing: 1,
-    z: 0, // depth
-    vz: 0,
     color: '#6c3',
 };
 
 // Platforms/obstacles
 const platforms = [
-    {x: 0, y: groundY, w: 2000, h: 40, z: 0},
-    {x: 400, y: groundY - 120, w: 120, h: 20, z: 0},
-    {x: 700, y: groundY - 200, w: 100, h: 20, z: 1},
-    {x: 1000, y: groundY - 80, w: 80, h: 20, z: -1},
-    {x: 1300, y: groundY - 160, w: 120, h: 20, z: 0},
-    {x: 1600, y: groundY - 100, w: 100, h: 20, z: 1},
+    {x: 0, y: groundY, w: 1000, h: 100, z: 0},
+    {x: 2500, y: groundY, w: 1000, h: 100, z: 0},
+    {x: 500, y: groundY - 121, w: 120, h: 50, z: 0},
+    {x: 800, y: groundY - 200, w: 100, h: 50, z: 0},
+    {x: 1100, y: groundY - 121, w: 120, h: 50, z: 0},
+    {x: 1400, y: groundY - 200, w: 100, h: 50, z: 0},
+    {x: 1700, y: groundY - 121, w: 80, h: 50, z: 0},
+    {x: 2000, y: groundY - 160, w: 120, h: 50, z: 0},
+    {x: 2300, y: groundY - 100, w: 100, h: 50, z: 0},
 ];
 
 // Controls
@@ -78,13 +80,15 @@ function shakeScreen() {
 function drawPlayer() {
     // Simpel T-Rex sprite
     ctx.save();
-    ctx.translate(player.x - cameraX, player.y + player.z * 12);
+    ctx.translate(player.x - cameraX, player.y);
     ctx.scale(player.facing, 1);
     ctx.fillStyle = player.color;
     ctx.fillRect(-player.w/2, -player.h, player.w, player.h);
     // Staart
+    ctx.fillStyle = player.color;
+    ctx.fillRect(-player.w, -player.h/4, player.w/2, player.h/4);
     ctx.fillStyle = '#384';
-    ctx.fillRect(-player.facing*player.w/2, -player.h/2, player.facing*30, 12);
+    ctx.fillRect(-player.w/4*3, -player.h/2, player.w/4, player.h/4);
     // Oog
     ctx.fillStyle = '#fff';
     ctx.beginPath();
@@ -100,22 +104,29 @@ function drawPlayer() {
 function drawPlatforms() {
     for (const p of platforms) {
         ctx.save();
-        ctx.globalAlpha = 1 - Math.abs(p.z)*0.3;
-        ctx.fillStyle = p.z === 0 ? '#964B00' : (p.z > 0 ? '#b88c4a' : '#3a2a1a');
-        ctx.fillRect(p.x - cameraX, p.y + p.z*12, p.w, p.h);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#964B00';
+        ctx.fillRect(p.x - cameraX, p.y, p.w, p.h);
         ctx.restore();
     }
 }
 
 function drawUI() {
     ctx.save();
-    ctx.font = 'bold 24px sans-serif';
+    ctx.font = 'bold 12px sans-serif';
     ctx.fillStyle = '#fff';
-    ctx.fillText('DinoStamp: T-Rex Platformer', 24, 40);
+    ctx.fillText('DinoStamp: T-Rex Platformer' + JSON.stringify(player), 24, 40);
     ctx.restore();
 }
 
 function updatePlayer() {
+    if (player.y > H) {
+        player.x = 100;
+        player.y = groundY - 80;
+        player.vy = 0;
+        //cameraX = 0;
+    }
+
     // Horizontaal
     if (keys['a'] || keys['arrowleft']) {
         player.vx = -player.speed;
@@ -126,41 +137,36 @@ function updatePlayer() {
     } else {
         player.vx = 0;
     }
-    // Diepte (Golden Axe-style)
-    if (keys['w'] || keys['arrowup']) {
-        player.vz = -2;
-    } else if (keys['s'] || keys['arrowdown']) {
-        player.vz = 2;
-    } else {
-        player.vz = 0;
-    }
     // Jump
-    if ((keys[' '] || keys['z']) && !player.jumping) {
+    if ((keys[' '] || keys['z']|| keys['arrowup']) && !player.jumping) {
         player.vy = -22;
         player.jumping = true;
     }
+    if (keys['p']){
+        player.starred = !player.starred;
+    }
     // Apply
     player.x += player.vx;
-    player.z += player.vz;
-    if (player.z < -2) player.z = -2;
-    if (player.z > 2) player.z = 2;
     player.y += player.vy;
     player.vy += gravity;
     // Collision
     let onGround = false;
     for (const p of platforms) {
-        if (Math.abs(player.z - p.z) <= 0.7) {
-            if (
-                player.x + player.w/2 > p.x &&
-                player.x - player.w/2 < p.x + p.w &&
-                player.y + 2 > p.y &&
-                player.y + 2 < p.y + p.h &&
-                player.vy >= 0
-            ) {
+        if (
+            player.x + player.w/2 > p.x &&
+            player.x - player.w/2 < p.x + p.w &&
+            player.y + 2 > p.y &&
+            player.y + 2 < p.y + p.h &&
+            player.vy >= 0
+        ) {
+            if (player.starred) {
+                // Blijf springen
                 player.y = p.y - player.h;
-                player.vy = 0;
-                onGround = true;
+            } else {
+                player.y = p.y;
             }
+            player.vy = 0;
+            onGround = true;
         }
     }
     if (onGround) {
