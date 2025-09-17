@@ -15,6 +15,7 @@
             margin: 0 auto;
             background: linear-gradient(to top, #4e8c4e 60%, #87ceeb 100%);
             box-shadow: 0 0 40px #000a;
+            width: 100%;
         }
     </style>
 </head>
@@ -46,18 +47,73 @@ const player = {
     color: '#6c3',
 };
 
-// Platforms/obstacles
+
+
+// // Platforms/obstacles
+// const platforms = [
+//     {x: 0, y: groundY, w: 1000, h: groundY},
+//     {x: 2500, y: groundY, w: 1000, h: groundY},
+//     {x: 500, y: groundY - 120, w: 120, h: 50}, // Letop minimale hoogte is 50
+//     {x: 800, y: groundY - 200, w: 100, h: 50},
+//     {x: 1100, y: groundY - 120, w: 120, h: 50},
+//     {x: 1400, y: groundY - 200, w: 100, h: 50},
+//     {x: 1700, y: groundY - 120, w: 80, h: 50},
+//     {x: 2000, y: groundY - 160, w: 120, h: 50},
+//     {x: 2300, y: groundY - 100, w: 100, h: 50},
+// ];
+
 const platforms = [
-    {x: 0, y: groundY, w: 1000, h: 100, z: 0},
-    {x: 2500, y: groundY, w: 1000, h: 100, z: 0},
-    {x: 500, y: groundY - 121, w: 120, h: 50, z: 0},
-    {x: 800, y: groundY - 200, w: 100, h: 50, z: 0},
-    {x: 1100, y: groundY - 121, w: 120, h: 50, z: 0},
-    {x: 1400, y: groundY - 200, w: 100, h: 50, z: 0},
-    {x: 1700, y: groundY - 121, w: 80, h: 50, z: 0},
-    {x: 2000, y: groundY - 160, w: 120, h: 50, z: 0},
-    {x: 2300, y: groundY - 100, w: 100, h: 50, z: 0},
+    {x: 0, y: groundY, w: 1000, h: groundY},
+    {x: 2500, y: groundY, w: 1000, h: groundY},
+    {x: 5000, y: groundY - 20, w: 1000, h: groundY},
+    
+    {x: 7000, y: groundY + 20, w: 1000, h: groundY},
+    // Eindplatform
+    {x: 12000, y: groundY, w: 1000, h: groundY},
+
+    {x: 500, y: groundY - 120, w: 120, h: 50},
+    {x: 800, y: groundY - 200, w: 100, h: 50},
+    {x: 1100, y: groundY - 120, w: 120, h: 50},
+    {x: 1400, y: groundY - 200, w: 100, h: 50},
+    {x: 1700, y: groundY - 120, w: 80, h: 50},
+    {x: 2000, y: groundY - 160, w: 120, h: 50},
+    {x: 2300, y: groundY - 100, w: 100, h: 50},
+
+    // Begin extra sectie
+    {x: 2600, y: groundY - 140, w: 120, h: 50},
+    {x: 2900, y: groundY - 180, w: 100, h: 50},
+    {x: 3200, y: groundY - 120, w: 80, h: 50},
+    {x: 3500, y: groundY - 160, w: 100, h: 50},
+    {x: 3800, y: groundY - 100, w: 120, h: 50},
+    {x: 4100, y: groundY - 200, w: 80, h: 50},
+    {x: 4400, y: groundY - 150, w: 100, h: 50},
+    {x: 4700, y: groundY - 100, w: 120, h: 50},
+    {x: 5000, y: groundY - 180, w: 100, h: 50},
+    {x: 5300, y: groundY - 120, w: 80, h: 50},
+    {x: 5600, y: groundY - 160, w: 100, h: 50},
+    {x: 5900, y: groundY - 100, w: 120, h: 50},
+    {x: 6200, y: groundY - 200, w: 80, h: 50},
+    {x: 6500, y: groundY - 140, w: 100, h: 50},
+    {x: 6800, y: groundY - 120, w: 120, h: 50},
+    {x: 7100, y: groundY - 180, w: 100, h: 50},
+    {x: 7400, y: groundY - 150, w: 80, h: 50},
+    {x: 7700, y: groundY - 100, w: 100, h: 50},
+    {x: 8000, y: groundY - 200, w: 120, h: 50},
+    {x: 8300, y: groundY - 160, w: 100, h: 50},
+    {x: 8600, y: groundY - 120, w: 80, h: 50},
+    {x: 8900, y: groundY - 180, w: 100, h: 50},
+    {x: 9200, y: groundY - 140, w: 120, h: 50},
+    {x: 9500, y: groundY - 100, w: 100, h: 50},
+    {x: 9800, y: groundY - 160, w: 80, h: 50},
+    {x: 10100, y: groundY - 200, w: 100, h: 50},
+    {x: 10400, y: groundY - 120, w: 120, h: 50},
+    {x: 10700, y: groundY - 150, w: 100, h: 50},
+    {x: 11000, y: groundY - 100, w: 80, h: 50},
+    {x: 11300, y: groundY - 180, w: 100, h: 50},
+    {x: 11600, y: groundY - 140, w: 120, h: 50},
+
 ];
+
 
 // Controls
 const keys = {};
