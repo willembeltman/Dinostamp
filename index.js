@@ -1,3 +1,4 @@
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
@@ -87,6 +88,7 @@ const enemies = [
         dir: 1,
         color: '#c33',
         platform: groundplatforms[0],
+        poisonous: false
     }
 ];
 
@@ -100,6 +102,39 @@ function updateEnemies() {
         } else if (e.x + e.w > e.platform.x + e.platform.w) {
             e.x = e.platform.x + e.platform.w - e.w;
             e.dir = -1;
+        }
+    }
+}
+
+// Collision tussen speler en vijand
+function checkEnemyCollision() {
+    for (const e of enemies) {
+        // AABB collision
+        if (
+            player.x + player.w/2 > e.x &&
+            player.x - player.w/2 < e.x + e.w //&&
+            //player.y + player.h > e.y &&
+            //player.y < e.y + e.h
+        ) {
+            player.inCollision = true;
+            // Enemy is "sterker" tenzij hij giftig is
+            if (!e.poisonous) {
+                // Duw speler weg afhankelijk van enemy richting
+                const push = 12;
+                if (player.x < e.x) {
+                    player.x -= push;
+                } else {
+                    player.x += push;
+                }
+                // Eventueel shake/geluid
+                shakeScreen();
+            } else {
+                // Hier kun je giftig effect toevoegen
+            }
+        }
+        else {
+            
+            player.inCollision = false;
         }
     }
 }
@@ -182,7 +217,9 @@ function drawUI() {
     ctx.save();
     ctx.font = 'bold 12px sans-serif';
     ctx.fillStyle = '#fff';
-    ctx.fillText('DinoStamp: T-Rex Platformer' + JSON.stringify(player), 24, 40);
+    ctx.fillText('DinoStamp: T-Rex Platformer' + JSON.stringify(player), 24, 20);
+    ctx.fillText(JSON.stringify(player), 24, 40);
+    ctx.fillText(JSON.stringify(enemies), 24, 60);
     ctx.restore();
 }
 
@@ -191,7 +228,6 @@ function updatePlayer() {
         player.x = 100;
         player.y = groundY - 80;
         player.vy = 0;
-        //cameraX = 0;
     }
 
     // Horizontaal
@@ -276,6 +312,7 @@ function render() {
 function gameLoop() {
     updatePlayer();
     updateEnemies();
+    checkEnemyCollision();
     updateShake();
     render();
     requestAnimationFrame(gameLoop);
