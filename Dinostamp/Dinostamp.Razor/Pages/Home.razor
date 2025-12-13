@@ -1,0 +1,42 @@
+﻿@page "/"
+@inject IJSRuntime JS
+
+<PageTitle>Home</PageTitle>
+
+<canvas id="game" width="960" height="540"></canvas>
+<audio id="boom" src="dinostamp/Boom.wav"></audio>
+<script src="dinostamp/index.js"></script>
+<style>
+    canvas {
+        display: block;
+        margin: 0 auto;
+        background: linear-gradient(to top, #4e8c4e 60%, #87ceeb 100%);
+        box-shadow: 0 0 40px #000a;
+        width: 100%;
+    }
+</style>
+
+@code {
+    private Game Game = new Game();
+    private DotNetObjectReference<Home>? objRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("gameInterop.init", objRef);
+        }
+    }
+
+    [JSInvokable]
+    public Frame GetFrame() => Game.GetFrame();
+   
+    [JSInvokable]
+    public void UpdateInputs(Inputs input) => Game.UpdateInputs(input);
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}
