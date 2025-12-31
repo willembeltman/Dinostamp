@@ -1,4 +1,4 @@
-﻿<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="@GetAdditionalAssemblies()">
+﻿<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -10,11 +10,3 @@
         </LayoutView>
     </NotFound>
 </Router>
-
-
-@code {
-    private System.Reflection.Assembly[] GetAdditionalAssemblies()
-    {
-        return new[] { typeof(Dinostamp.Razor.Pages.Home).Assembly };
-    }
-}

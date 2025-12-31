@@ -4,8 +4,7 @@
 <PageTitle>Home</PageTitle>
 
 <canvas id="game" width="960" height="540"></canvas>
-<audio id="boom" src="dinostamp/Boom.wav"></audio>
-<script src="dinostamp/index.js"></script>
+<audio id="boom" src="~/Boom.wav"></audio>
 <style>
     canvas {
         display: block;
@@ -25,18 +24,22 @@
         if (firstRender)
         {
             objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("gameInterop.init", objRef);
+            await JS.InvokeVoidAsync("window.gameInterop.init", objRef);
         }
     }
 
     [JSInvokable]
-    public Frame GetFrame() => Game.GetFrame();
-   
+    public Frame GetFrame(int width, int height)
+        => Game.GetFrame(width, height);
+
     [JSInvokable]
-    public void UpdateInputs(Inputs input) => Game.UpdateInputs(input);
+    public void KeyDown(string key)
+        => Game.KeyDown(key);
+
+    [JSInvokable]
+    public void KeyUp(string key)
+        => Game.KeyUp(key);
 
     public void Dispose()
-    {
-        objRef?.Dispose();
-    }
+        => objRef?.Dispose();
 }

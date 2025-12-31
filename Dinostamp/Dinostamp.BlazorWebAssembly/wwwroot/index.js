@@ -1,15 +1,13 @@
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-const W = canvas.width
-const H = canvas.height;
+const W = canvas.width, H = canvas.height;
 
 // Game world
 const gravity = 1.1;
 const groundY = H - 80;
-let cameraX = 0;
-let cameraShake = 0;
-let shakeTime = 0;
+let cameraX = 0, cameraShake = 0, shakeTime = 0;
+let BlazorReference = null;
 
 const groundplatforms = [
     {x: 0, y: groundY, w: 1000, h: groundY},
@@ -64,6 +62,22 @@ const normalplatforms = [
 
 const platforms = [...groundplatforms, ...normalplatforms];
 
+// Enemies
+const enemies = [
+    {
+        x: groundplatforms[0].x + 200,
+        y: groundplatforms[0].y - 40,
+        w: 40,
+        h: 40,
+        vx: 2,
+        facing: 1,
+        color: '#c33',
+        platform: groundplatforms[0],
+        poisonous: false
+    }
+];
+
+// Player (T-Rex)
 const player = {
     x: 100,
     y: groundY - 80,
@@ -78,20 +92,7 @@ const player = {
     color: '#6c3',
 };
 
-const enemies = [ 
-    {
-        x: groundplatforms[0].x + 200,
-        y: groundplatforms[0].y - 40,
-        w: 40,
-        h: 40,
-        vx: 2,
-        dir: 1,
-        color: '#c33',
-        platform: groundplatforms[0],
-        poisonous: false
-    }
-];
-
+// Controls
 const keys = {};
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
@@ -101,14 +102,14 @@ const boom = document.getElementById('boom');
 
 function updateEnemies() {
     for (const e of enemies) {
-        e.x += e.vx * e.dir;
+        e.x += e.vx * e.facing;
         // Keer om aan de randen van het platform
         if (e.x < e.platform.x) {
             e.x = e.platform.x;
-            e.dir = 1;
+            e.facing = 1;
         } else if (e.x + e.w > e.platform.x + e.platform.w) {
             e.x = e.platform.x + e.platform.w - e.w;
-            e.dir = -1;
+            e.facing = -1;
         }
     }
 }
@@ -310,7 +311,6 @@ function gameLoop() {
 }
 
 function init(){
-
     gameLoop();
 }
 
